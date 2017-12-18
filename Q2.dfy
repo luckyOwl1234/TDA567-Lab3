@@ -19,11 +19,11 @@ method Q2(x : int, y : int) returns (big : int, small : int)
 
     Q = None
     R = big > small
-    S = if (x > y) then {big := x, small := y} else {big := y, small := y}
+    S = if (x > y) then {big,small := x,y} else {big,small := y,x}
 
-    None ==> wp(if(x > y) then {big := x, small := y} else {big := y, small := x})
+    None ==> wp(if(x > y) then {big,small := x,y} else {big,small := y,x})
 
-    wp(if(x > y) then {big := x, small := y} else {big := y, small := y}, big > small) =>
+    wp(if(x > y) then {big,small := x,y} else {big,small := y,x}, big > small) =>
     conditional and assignment rule
 
     Conditional rule:
@@ -32,7 +32,9 @@ method Q2(x : int, y : int) returns (big : int, small : int)
 
     Assignment rule:
 
-    (x > y ==> x > y) && (x <= y ==> y > x) = true && false = false
+    ((x > y ==> x > y) && (x <= y ==> y > x)) = true && false = false
+
+    This shows that if the parameters are the same it will fail.
 */
 
 //Fixing program:
@@ -50,7 +52,7 @@ method Q2(x : int, y : int) returns (big : int, small : int)
 
 
 //2.
-method Q2(x : int, y : int) returns (big : int, small : int)
+method Q2SameParametersAllowed(x : int, y : int) returns (big : int, small : int)
   ensures big >= small;
 {
   if (x > y)
