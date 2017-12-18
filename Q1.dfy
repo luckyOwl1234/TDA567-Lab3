@@ -17,11 +17,11 @@ method Abs(x : int) returns (y : int)
 2.
     Q ==> wp(S,R)
 
-    Q = empty
+    Q = None
     R = (0 <= x ==> y == x) && (x < 0 ==> y == -x) && (0 <= y)
     S = if(x < 0) then {y := -x} else {y := x}
 
-    empty ==> wp(if(x < 0) then {y := -x} else {y := x}, (0 <= x ==> y == x) &&
+    None ==> wp(if(x < 0) then {y := -x} else {y := x}, (0 <= x ==> y == x) &&
                 (x < 0 ==> y == -x) && (0 <= y)) ==> conditional and assignment rule
 
     Conditional rule:

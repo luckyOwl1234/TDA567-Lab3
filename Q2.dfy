@@ -17,11 +17,11 @@ method Q2(x : int, y : int) returns (big : int, small : int)
 
     Q ==> wp(S,R)
 
-    Q = empty
+    Q = None
     R = big > small
     S = if (x > y) then {big := x, small := y} else {big := y, small := y}
 
-    empty ==> wp(if(x > y) then {big := x, small := y} else {big := y, small := x})
+    None ==> wp(if(x > y) then {big := x, small := y} else {big := y, small := x})
 
     wp(if(x > y) then {big := x, small := y} else {big := y, small := y}, big > small) =>
     conditional and assignment rule
