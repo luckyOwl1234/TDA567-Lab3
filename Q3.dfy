@@ -8,7 +8,7 @@ local shadows.
 2.
 Q3 is a multiply method. It's purpose is to multiply two values and return the
 answer. It follows that the postcondition should be `ensures res == n0 * m0;`,
-i.e. arithmetic multiplication
+i.e. arithmetic multiplication.
 
 */
 
