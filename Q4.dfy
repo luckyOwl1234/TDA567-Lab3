@@ -21,7 +21,6 @@ method ComputeFact(n : nat) returns (res : nat)
      if n == 0 then 1 else n * fact(n - 1)
  }
 
-
 /*
 
 --------------------------------------------------------------------------------
@@ -92,47 +91,50 @@ method ComputeFact(n : nat) returns (res : nat)
 
 
 
-** Simplify
+** Simplify // TODO
 
   (i <= n && 2 <= i <= n + 1 && res == fact(i - 1) ==> 2 <= i + 1 <= n + 1 && res * i == fact(i))
 
   (i <= n && 2 <= i <= n + 1 && res == fact(i - 1) ==> 2 <= i + 1 <= n + 1 && fact(i - 1) * i == fact(i))
 
-  // TODO
+  (i <= n && 2 <= i <= n + 1 && res == fact(i - 1) ==> 2 <= i + 1 <= n + 1 && true // Trivially true
+
+  (i <= n && 2 <= i <= n + 1 && res == fact(i - 1) ==> 2 <= i + 1 <= n + 1
+
+  (true && 2 <= i <= n + 1 && res == fact(i - 1)   ==> 2 <= i + 1 <= n + 1 // Has to be true to enter the loop
+
+  (2 <= i <= n + 1 && res == fact(i - 1)           ==> 2 <= i + 1 <= n + 1
 
 
 
 
 
 
+** Prove variant bounded below by zero
+
+  I ==> D >= 0
+
+  I: 2 <= i <= n + 1 && res == fact(i - 1)
+
+  Relevant part: i <= n + 1
+
+  i <= (n + 1) ==> (n - i) >= 0
+  i - 1 <= n ==> n >= i
+
+  False criteron
+  1. i <= (n + 1)
+  2. (n - i) < 0
+
+  Ex.
+  i = 2
+  n = 1
 
 
 
 
 
 
-
-
-
-** Prove invariant before entering loop
-
-  Q ==> wp(S1, wp(S2, I))
-
-** Substitute with actual values
-
-  Q ==> wp(res := 1, wp(i := 2, 2 <= i <= n + 1 && res == fact(i - 1)))
-
-** Apply Assignment Rule twice
-
-  wp(i := 2, 2 <= i <= n + 1 && res == fact(i - 1)) --> 2 <= 2 <= n + 1 && res == fact(2 - 1)
-
-  wp(res := 1, 2 <= 2 <= n + 1 && res == fact(2 - 1)) --> 2 <= 2 <= n + 1 && 1 == fact(2 - 1))
-
-  Q ==> 2 <= 2 <= n + 1 && 1 == fact(2 - 1))
-
-
-
-// TODO: Remove the following
+// Early attempt, probably wrong?
 
 ** Prove invariant before entering loop
 
