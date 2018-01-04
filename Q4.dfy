@@ -21,12 +21,14 @@ method ComputeFact(n : nat) returns (res : nat)
      if n == 0 then 1 else n * fact(n - 1)
  }
 
-
+/*
 
 --------------------------------------------------------------------------------
 
 //2.
 ** Specification
+
+  Q ==> wp(S1; S2, wp(while B I D SS1; SS2, R))
 
   wp(while B I D S, R)
 
@@ -43,6 +45,8 @@ method ComputeFact(n : nat) returns (res : nat)
   SS1: res := res * i
   SS2: i := i + 1
 
+
+
 ** Formula from pdf
 
   wp(while B I D S, R) =
@@ -53,7 +57,6 @@ method ComputeFact(n : nat) returns (res : nat)
     && (I ==> D >= 0)
     && (B && I ==>
       wp(tmp := D ; S, tmp > D))
-
 
 
 
@@ -70,7 +73,9 @@ method ComputeFact(n : nat) returns (res : nat)
 
 
 
-** Apply Sequential Rule once
+** Prove invariant preservation during loop
+
+* Apply Sequential Rule once
 
   (i <= n && 2 <= i <= n + 1 && res == fact(i - 1) ==> wp(res := res * i; i := i + 1, 2 <= i <= n + 1 && res == fact(i - 1)))
 
@@ -78,7 +83,7 @@ method ComputeFact(n : nat) returns (res : nat)
 
 
 
-** Apply Assignment Rule twice
+* Apply Assignment Rule twice
 
   (i <= n && 2 <= i <= n + 1 && res == fact(i - 1) ==> wp(res := res * i, wp(i := i + 1, 2 <= i <= n + 1 && res == fact(i - 1))))
 
@@ -88,7 +93,7 @@ method ComputeFact(n : nat) returns (res : nat)
 
 
 
-** Simplify // TODO
+* Simplify
 
   (i <= n && 2 <= i <= n + 1 && res == fact(i - 1) ==> 2 <= i + 1 <= n + 1 && res * i == fact(i))
 
@@ -98,9 +103,51 @@ method ComputeFact(n : nat) returns (res : nat)
 
   (i <= n && 2 <= i <= n + 1 && res == fact(i - 1) ==> 2 <= i + 1 <= n + 1
 
-  (true && 2 <= i <= n + 1 && res == fact(i - 1)   ==> 2 <= i + 1 <= n + 1 // Has to be true to enter the loop
+  (          2 <= i <= n     && res == fact(i - 1) ==> 2 <= i + 1 <= n + 1 // Combine statements
 
-  (2 <= i <= n + 1 && res == fact(i - 1)           ==> 2 <= i + 1 <= n + 1
+  (          2 <= i <= n     && res == fact(i - 1) ==> 2 <= i + 1 <= n + 1
+
+  (          2 <= i <= n     && res == fact(i - 1) ==> 1 <= i <= n 
+
+
+* Proof
+
+  Since LHS is a stronger statement than RHS, if LHS is true --> RHS is true.
+
+  If LHS is false, the implication is per definition true.
+
+
+
+
+
+** Prove invariant after loop
+
+  !B && I ==> R
+
+* Substitute with actual values
+
+  !B && I ==> R
+
+  !(i <= n) && 2 <= i <= n + 1 && res == fact(i - 1) ==> res == fact(n)
+
+* Simplify
+
+  !(i <= n) && 2 <= i <= n + 1 && res == fact(i - 1) ==> res == fact(n) -->
+
+  (i > n)   && 2 <= i <= n + 1 && res == fact(i - 1) ==> res == fact(n)
+
+  (i > n)   && 2 <= i <= n + 1 && res == fact(i - 1) ==> fact(i - 1) == fact(n)
+
+* Proof
+
+  The conditions for LHS to evaluate true guarantees that RHS evalutes true
+
+  This is because the condition for RHS to evaluate false is n != i + 1.
+
+  If RHS evaluates false, either of the first two expressions in LHS will evaluate false
+  (depending on a difference of 1 or a difference of >1), resulting in a true implication.
+
+
 
 
 
@@ -115,6 +162,8 @@ method ComputeFact(n : nat) returns (res : nat)
   i <= (n + 1) ==> (n - i) >= 0
   i - 1 <= n ==> n >= i
 
+* Proof
+
   Case 1 that would evaluate the expression false: n = 0, i = 1
   However, the invariant protects against i < 2, so this cannot occur.
 
@@ -122,6 +171,8 @@ method ComputeFact(n : nat) returns (res : nat)
   However, the invariant ensures that the n parameter becomes n + 1 when evaluated, resulting in n = 2, i = 2, which evaluates to true.
 
   This proves that the variant is bounded below zero.
+
+
 
 
 
@@ -159,7 +210,7 @@ method ComputeFact(n : nat) returns (res : nat)
 
   i <= n && 2 <= i <= n + 1 && res == fact(i - 1) ==> n - i > n - i - 1
 
-* Simplify
+* Proof
 
   i <= n && 2 <= i <= n + 1 && res == fact(i - 1) ==> n - i > n - i - 1
 
@@ -174,65 +225,62 @@ method ComputeFact(n : nat) returns (res : nat)
   This proves the decrementation D.
   
 
+  
 
-** Prove invariant after loop
+** Prove invariant holds before loop
 
-  !B && I ==> R
+  Q ==> wp(S1; S2, I)
+
+* Apply Sequential Rule once
+
+  wp(S1; S2, I) --> wp(S1, wp(S2, I))
 
 * Substitute with actual values
 
-  !B && I ==> R
+  wp(S1, wp(S2, I)) --> wp(res := 1, wp(i := 2, 2 <= i <= n + 1 && res == fact(i - 1)))
 
-  !(i <= n) && 2 <= i <= n + 1 && res == fact(i - 1) ==> res == fact(n)
+* Apply Assignment Rule twice
+
+  wp(res := 1, wp(i := 2, 2 <= i   <= n + 1 && res == fact(i   - 1))) -->
+
+  wp(res := 1,            2 <= (2) <= n + 1 && res == fact((2) - 1))  -->
+
+  wp(res := 1,            2 <= 2   <= n + 1 && res == fact(2   - 1))  -->
+
+                          2 <= 2   <= n + 1 && (1) == fact(2   - 1)   -->
+
+                          2 <= 2   <= n + 1 && 1   == fact(2   - 1)   -->
 
 * Simplify
 
-  !(i <= n) && 2 <= i <= n + 1 && res == fact(i - 1) ==> res == fact(n) -->
+  2 <= 2 <= n + 1 && 1 == fact(2 - 1) -->
 
-  (i > n)   && 2 <= i <= n + 1 && res == fact(i - 1) ==> res == fact(n)
+       2 <= n + 1 && 1 == fact(2 - 1) -->
 
-  (i > n)   && 2 <= i <= n + 1 && res == fact(i - 1) ==> fact(i - 1) == fact(n)
+       2 <= n + 1 && true             -->
 
-* Proof
+       2 <= n + 1                     -->
 
-  The conditions for LHS to evaluate true guarantees that RHS evalutes true
+       2 - 1 <= n                     -->
 
-  This is because the condition for RHS to evaluate false is n != i + 1.
+       1 <= n                         -->
 
-  If RHS evaluates false, either of the first two expressions in LHS will evaluate false
-  (depending on a difference of 1 or a difference of >1), resulting in a true implication.
+       n >= 1                         -->
 
+* Recap
 
+  Q ==> n >= 1 --> n > 0 ==> n >= 1
 
-
-
-
-
+  Trivially true, proving that the invariant holds before loop.
 
 
 
 
 
+** Conclusion
 
-
-
-// Early attempt, probably wrong?
-
-** Prove invariant before entering loop
-
-  Q ==> wp(S1, wp(S2, I))
-
-** Substitute with actual values
-
-  Q ==> wp(res := 1, wp(i := 2, 2 <= i <= n + 1 && res == fact(i - 1)))
-
-** Apply Assignment Rule twice
-
-  wp(i := 2, 2 <= i <= n + 1 && res == fact(i - 1)) --> 2 <= 2 <= n + 1 && res == fact(2 - 1)
-
-  wp(res := 1, 2 <= 2 <= n + 1 && res == fact(2 - 1)) --> 2 <= 2 <= n + 1 && 1 == fact(2 - 1))
-
-  Q ==> 2 <= 2 <= n + 1 && 1 == fact(2 - 1))
+Since all 5 loop conditions for correct loop are proven true, there's no need
+to change any preconditions since the loop is in itself proven to be true. QED.
 
 */
 
