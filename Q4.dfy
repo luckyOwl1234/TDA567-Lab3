@@ -21,7 +21,7 @@ method ComputeFact(n : nat) returns (res : nat)
      if n == 0 then 1 else n * fact(n - 1)
  }
 
-/*
+
 
 --------------------------------------------------------------------------------
 
@@ -37,14 +37,11 @@ method ComputeFact(n : nat) returns (res : nat)
   I: 2 <= i <= n + 1 && res == fact(i - 1)
   D: n - i
 
-  //S1: res := 1
-  //S2: i := 2
+  S1: res := 1
+  S2: i := 2
 
-  //SS1: res := res * i
-  //SS2: i := i + 1
-
-  S1: res := res * i
-  S2: i := i + 1
+  SS1: res := res * i
+  SS2: i := i + 1
 
 ** Formula from pdf
 
@@ -107,27 +104,87 @@ method ComputeFact(n : nat) returns (res : nat)
 
 
 
-
-
-
 ** Prove variant bounded below by zero
 
   I ==> D >= 0
 
   I: 2 <= i <= n + 1 && res == fact(i - 1)
 
-  Relevant part: i <= n + 1
+  Relevant part: 2 <= i <= n + 1
 
   i <= (n + 1) ==> (n - i) >= 0
   i - 1 <= n ==> n >= i
 
-  False criteron
-  1. i <= (n + 1)
-  2. (n - i) < 0
+  Case 1 that would evaluate the expression false: n = 0, i = 1
+  However, the invariant protects against i < 2, so this cannot occur.
 
-  Ex.
-  i = 2
-  n = 1
+  Case 2 that would evaluate the expression false: n = 1, i = 2
+  However, the invariant ensures that the n parameter becomes n + 1 when evaluated, resulting in n = 2, i = 2, which evaluates to true.
+
+  This proves that the variant is bounded below zero.
+
+
+
+** Prove decrease expression
+
+  B && I ==> wp(tmp := D ; S, tmp > D)
+
+* Apply Sequential Rule twice
+
+  wp(tmp := D ; SS1 ; SS2, tmp > D) --> wp(tmp := D, wp(SS1, wp(SS2, tmp > D)))
+
+* Substitute with actual values
+
+  wp(tmp := D, wp(SS1, wp(SS2, tmp > D))) -->  wp(tmp := n - i, wp(res := res * i, wp(i := i + 1, tmp > n - i)))
+
+* Apply Assignment Rule once
+
+  wp(tmp := n - i, wp(res := res * i, wp(i := i + 1, tmp > n - i))) --> wp(tmp := n - i, wp(res := res * i, tmp > n - (i + 1)))
+
+                                                                    --> wp(tmp := n - i, wp(res := res * i, tmp > n - i - 1))
+
+                                                                    --> wp(tmp := n - i, tmp > n - i - 1)
+
+                                                                    --> n - i > n - i - 1
+
+* Recap
+
+  B && I ==> wp(tmp := D ; S, tmp > D)
+
+  B && I ==> n - i > n - i - 1
+
+* Substitute with actual values
+
+  B && I ==> n - i > n - i - 1 -->
+
+  i <= n && 2 <= i <= n + 1 && res == fact(i - 1) ==> n - i > n - i - 1
+
+* Simplify
+
+  i <= n && 2 <= i <= n + 1 && res == fact(i - 1) ==> n - i > n - i - 1
+
+  true   && true            && res == fact(2 - 1) ==> n > n - 1
+
+  true   && true            && true/false         ==> true
+
+  true/false                                      ==> true
+
+  true
+
+  This proves the decrementation D.
+  
+
+
+** Prove invariant after loop
+
+  !B && I ==> R
+
+* Substitute with actual values
+
+  !B && I ==> R
+
+  !(i <= n) && 2 <= i <= n + 1 && res == fact(i - 1) ==> res == fact(n)
+
 
 
 
