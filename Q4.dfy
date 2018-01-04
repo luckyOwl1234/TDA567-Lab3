@@ -185,6 +185,31 @@ method ComputeFact(n : nat) returns (res : nat)
 
   !(i <= n) && 2 <= i <= n + 1 && res == fact(i - 1) ==> res == fact(n)
 
+* Simplify
+
+  !(i <= n) && 2 <= i <= n + 1 && res == fact(i - 1) ==> res == fact(n) -->
+
+  (i > n)   && 2 <= i <= n + 1 && res == fact(i - 1) ==> res == fact(n)
+
+  (i > n)   && 2 <= i <= n + 1 && res == fact(i - 1) ==> fact(i - 1) == fact(n)
+
+* Proof
+
+  The conditions for LHS to evaluate true guarantees that RHS evalutes true
+
+  This is because the condition for RHS to evaluate false is n != i + 1.
+
+  If RHS evaluates false, either of the first two expressions in LHS will evaluate false
+  (depending on a difference of 1 or a difference of >1), resulting in a true implication.
+
+
+
+
+
+
+
+
+
 
 
 
